@@ -6,7 +6,7 @@ import 'package:weatherapp/models/weather_model.dart';
 import 'package:weatherapp/services/weather_service.dart';
 import 'package:weatherapp/custom_widgets/custom_snackbar.dart';
 import 'package:weatherapp/custom_widgets/custom_textfield.dart';
-import 'package:weatherapp/custom_widgets/loading_indicator.dart';
+import 'package:weatherapp/custom_widgets/custom_loading_indicator.dart';
 
 class Searchpage extends StatefulWidget {
   final VoidCallback? updateUi;
@@ -53,10 +53,10 @@ class SearchPageState extends State<Searchpage>
 
       if (!mounted) return;
 
-      Provider.of<WeatherProvider>(context, listen: false).weatherDate =
-          weather;
-      Provider.of<WeatherProvider>(context, listen: false).cityName = cityName;
-      widget.updateUi?.call();
+      Provider.of<WeatherProvider>(context, listen: false)
+          .setWeatherData(weather);
+      Provider.of<WeatherProvider>(context, listen: false)
+          .setCityName(cityName);
 
       showCustomSnackBar(
         context: context,
@@ -68,7 +68,9 @@ class SearchPageState extends State<Searchpage>
       Future.delayed(
         const Duration(milliseconds: 800),
         () {
-          if (mounted) Navigator.pop(context);
+          if (mounted) {
+            Navigator.pop(context, true);
+          }
         },
       );
     } catch (e) {
