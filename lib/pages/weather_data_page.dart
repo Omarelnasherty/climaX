@@ -43,20 +43,6 @@ class _WeatherDataPageState extends State<WeatherDataPage> {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
-      leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NoWeatherDataPage(
-                  fadeAnimation: AlwaysStoppedAnimation(1.0),
-                  slideAnimation: AlwaysStoppedAnimation(0),
-                  updateUi: widget.updateUi,
-                ),
-              ),
-            );
-          }),
     );
   }
 

@@ -36,10 +36,10 @@ class WeatherProvider with ChangeNotifier {
         );
       }
     } catch (e) {
-      _setError("حدث خطأ أثناء جلب الموقع: $e");
+      _setError("حدث خطأ أثناء جلب الموقع ");
       showCustomSnackBar(
         context: context,
-        message: "حدث خطأ أثناء جلب الموقع: $e",
+        message: "حدث خطأ أثناء جلب الموقع ",
         color: Colors.red,
         icon: Icons.error,
       );
@@ -71,7 +71,7 @@ class WeatherProvider with ChangeNotifier {
         desiredAccuracy: LocationAccuracy.high,
       );
     } catch (e) {
-      throw Exception("حدث خطأ أثناء جلب الموقع: $e");
+      throw Exception("حدث خطأ أثناء جلب الموقع ");
     }
   }
 
