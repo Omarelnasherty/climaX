@@ -1,9 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:weatherapp/custom_widgets/custom_button.dart';
+import 'package:weatherapp/custom_widgets/custom_loading_animation.dart';
+import 'package:weatherapp/custom_widgets/custom_text.dart';
 import 'package:weatherapp/pages/searchpage.dart';
+import 'package:provider/provider.dart';
+import 'package:weatherapp/Providers/weather_provider.dart';
 
-class NoWeatherDataPage extends StatelessWidget {
+class NoWeatherDataPage extends StatefulWidget {
   final Animation<double> fadeAnimation;
   final Animation<double> slideAnimation;
   final Function updateUi;
@@ -16,115 +21,131 @@ class NoWeatherDataPage extends StatelessWidget {
   });
 
   @override
+  _NoWeatherDataPageState createState() => _NoWeatherDataPageState();
+}
+
+class _NoWeatherDataPageState extends State<NoWeatherDataPage> {
+  bool _isLoading = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF071327), Color(0xFF0B1A38)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: FadeTransition(
-            opacity: fadeAnimation,
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, -0.3),
-                    end: Offset.zero,
-                  ).animate(fadeAnimation),
-                  child: Text(
-                    "climaX",
-                    style: GoogleFonts.roboto(
-                      fontSize: 38,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+    final size = MediaQuery.of(context).size;
+    final height = size.height;
+    final width = size.width;
+
+    final verticalSpacing = height * 0.03;
+
+    return Stack(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF071327), Color(0xFF0B1A38)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: width * 0.06),
+              child: FadeTransition(
+                opacity: widget.fadeAnimation,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: height * 0.05),
+                    SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, -0.3),
+                        end: Offset.zero,
+                      ).animate(widget.fadeAnimation),
+                      child: CustomText(
+                        text: "climaX",
+                        fontSize: width * 0.11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ),
-                const Spacer(),
-                Lottie.asset(
-                  'assets/animations/location_animation.json',
-                  width: 160,
-                  height: 160,
-                  repeat: true,
-                ),
-                const SizedBox(height: 20),
-                Transform.translate(
-                  offset: Offset(0, slideAnimation.value),
-                  child: Text(
-                    "Give your phone a shake and let the magic happen!",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.roboto(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                    SizedBox(height: verticalSpacing * 0.5),
+                    CustomText(
+                      text: "Start your weather journey now",
+                      fontSize: width * 0.04,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withOpacity(0.6),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  "Not a fan of surprises? Type your city and get instant weather updates!",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.roboto(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white70,
-                  ),
-                ),
-                const Spacer(),
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () async {
-                      final result = await Navigator.push(
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                    Lottie.asset(
+                      'assets/animations/location.json',
+                      width: width * 0.6,
+                      height: width * 0.6,
+                      repeat: true,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox(),
+                    ),
+                    CustomButton(
+                      icon: Icons.location_on_rounded,
+                      text: "Use Current Location",
+                      color: Color(0xFF3A6FE9),
+                      onTap: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await Provider.of<WeatherProvider>(context,
+                                listen: false)
+                            .fetchWeatherDataByLocation(context);
+                        await Future.delayed(const Duration(seconds: 2));
+                        widget.updateUi();
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                      width: width,
+                    ),
+                    SizedBox(height: verticalSpacing * 0.7),
+                    CustomButton(
+                      icon: Icons.search_rounded,
+                      text: "Search for a City",
+                      color: Colors.transparent,
+                      borderColor: Color(0xFF3A6FE9),
+                      textColor: Color(0xFF3A6FE9),
+                      onTap: () async {
+                        final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Searchpage()));
-                      if (result == true) {
-                        updateUi();
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: double.infinity,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueAccent.withOpacity(0.3),
-                            blurRadius: 5,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Check the weather now!",
-                          style: GoogleFonts.roboto(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                              builder: (context) => const Searchpage()),
+                        );
+                        if (result == true) {
+                          widget.updateUi();
+                        }
+                      },
+                      width: width,
                     ),
-                  ),
+                    SizedBox(height: height * 0.05),
+                    CustomText(
+                      text: "Weather like never before",
+                      fontSize: width * 0.035,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withOpacity(0.5),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: height * 0.03),
+                  ],
                 ),
-                const SizedBox(height: 30),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        if (_isLoading)
+          CustomLoadingAnimation(
+            width: width,
+            height: height,
+          ),
+      ],
     );
   }
 }

@@ -65,14 +65,7 @@ class SearchPageState extends State<Searchpage>
         icon: Icons.check_circle,
       );
 
-      Future.delayed(
-        const Duration(milliseconds: 800),
-        () {
-          if (mounted) {
-            Navigator.pop(context, true);
-          }
-        },
-      );
+      Navigator.pop(context, true);
     } catch (e) {
       showCustomSnackBar(
         context: context,

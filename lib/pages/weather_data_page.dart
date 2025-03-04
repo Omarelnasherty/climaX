@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weatherapp/models/weather_model.dart';
-import 'package:weatherapp/pages/searchpage.dart';
+import 'package:weatherapp/pages/no_weather_data_page.dart';
 import 'package:weatherapp/widgets/location_info.dart';
 import 'package:weatherapp/widgets/date_info.dart';
 import 'package:weatherapp/widgets/weather_icon.dart';
@@ -44,7 +44,19 @@ class _WeatherDataPageState extends State<WeatherDataPage> {
       elevation: 0,
       backgroundColor: Colors.transparent,
       leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white), onPressed: () {}),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NoWeatherDataPage(
+                  fadeAnimation: AlwaysStoppedAnimation(1.0),
+                  slideAnimation: AlwaysStoppedAnimation(0),
+                  updateUi: widget.updateUi,
+                ),
+              ),
+            );
+          }),
     );
   }
 

@@ -20,6 +20,8 @@ class NewHomeState extends State<Homepage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    // تشغيل الأنيميشن
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -42,24 +44,20 @@ class NewHomeState extends State<Homepage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void updateUi() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     WeatherModel? weatherData =
-        Provider.of<WeatherProvider>(context).weatherDate;
+        Provider.of<WeatherProvider>(context).weatherData;
     return Scaffold(
       body: weatherData == null
           ? NoWeatherDataPage(
               fadeAnimation: _fadeAnimation,
               slideAnimation: _slideAnimation,
-              updateUi: updateUi,
+              updateUi: () => setState(() {}),
             )
           : WeatherDataPage(
               weatherData: weatherData,
-              updateUi: updateUi,
+              updateUi: () => setState(() {}),
             ),
     );
   }

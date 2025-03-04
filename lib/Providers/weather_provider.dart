@@ -2,67 +2,112 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weatherapp/models/weather_model.dart';
 import 'package:weatherapp/services/weather_service.dart';
+import 'package:weatherapp/custom_widgets/custom_snackbar.dart';
 
 class WeatherProvider with ChangeNotifier {
   WeatherModel? _weatherData;
   String? _cityName;
+  bool _isLoading = false;
+  String? _errorMessage;
 
-  WeatherModel? get weatherDate => _weatherData;
+  WeatherModel? get weatherData => _weatherData;
   String? get cityName => _cityName;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
-  Future<WeatherModel?> fetchWeatherDataByLocation() async {
+  Future<void> fetchWeatherDataByLocation(BuildContext context) async {
+    _setLoading(true);
+    _setError(null);
+
     try {
       final position = await _getLocation();
       final weatherData = await WeatherService()
           .getWeatherByLocation(position.latitude, position.longitude);
+
       if (weatherData != null) {
-        _cityName = weatherData
-            .cityName; // Assuming WeatherModel has a cityName property
-        setWeatherData(weatherData);
+        _setWeatherData(weatherData);
+      } else {
+        _setError("لم يتم العثور على بيانات الطقس.");
+        showCustomSnackBar(
+          context: context,
+          message: "لم يتم العثور على بيانات الطقس.",
+          color: Colors.red,
+          icon: Icons.error,
+        );
       }
-      return weatherData;
     } catch (e) {
-      print('Error fetching weather data: $e');
-      return null;
+      _setError("حدث خطأ أثناء جلب الموقع: $e");
+      showCustomSnackBar(
+        context: context,
+        message: "حدث خطأ أثناء جلب الموقع: $e",
+        color: Colors.red,
+        icon: Icons.error,
+      );
+    } finally {
+      _setLoading(false);
     }
   }
 
   Future<Position> _getLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled, return an error
-      throw Exception('Location services are disabled.');
+      throw Exception("خدمة الموقع غير مفعلة. يرجى تفعيلها من الإعدادات.");
     }
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, return an error
-        throw Exception('Location permissions are denied.');
+        throw Exception("تم رفض إذن الوصول للموقع.");
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, return an error
-      throw Exception('Location permissions are permanently denied.');
+      throw Exception("تم رفض إذن الوصول بشكل دائم. يرجى تغييره من الإعدادات.");
     }
 
-    // When we reach here, permissions are granted and we can continue
-    return await Geolocator.getCurrentPosition();
+    try {
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+    } catch (e) {
+      throw Exception("حدث خطأ أثناء جلب الموقع: $e");
+    }
+  }
+
+  void _setWeatherData(WeatherModel weatherData) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _weatherData = weatherData;
+      _cityName = weatherData.cityName;
+      notifyListeners();
+    });
   }
 
   void setWeatherData(WeatherModel weatherData) {
-    _weatherData = weatherData;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _weatherData = weatherData;
+      notifyListeners();
+    });
   }
 
   void setCityName(String cityName) {
-    _cityName = cityName;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _cityName = cityName;
+      notifyListeners();
+    });
+  }
+
+  void _setLoading(bool value) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isLoading = value;
+      notifyListeners();
+    });
+  }
+
+  void _setError(String? error) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _errorMessage = error;
+      notifyListeners();
+    });
   }
 }

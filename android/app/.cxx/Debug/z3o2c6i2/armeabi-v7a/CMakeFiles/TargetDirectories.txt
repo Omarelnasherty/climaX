@@ -1,0 +1,2 @@
+E:/My Projects/climaX/android/app/.cxx/Debug/z3o2c6i2/armeabi-v7a/CMakeFiles/edit_cache.dir
+E:/My Projects/climaX/android/app/.cxx/Debug/z3o2c6i2/armeabi-v7a/CMakeFiles/rebuild_cache.dir
