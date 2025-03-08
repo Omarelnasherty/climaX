@@ -42,6 +42,7 @@ Firebase: (If used) Authentication or database management.
 1. Clone the repository:
 
 git clone https://github.com/Omarelnasherty/climaX.git
+
 cd climaX
 
 
@@ -86,11 +87,14 @@ services/: API handling and data fetching.
 ## 🎥 Demo Videos 
 
 
-https://github.com/user-attachments/assets/ecb7f4f6-f2b6-4756-81b7-f68b50ef020a
+
+https://github.com/user-attachments/assets/80795dbc-f9c2-4753-9d29-faca843ec4cc    
 
 
 
-https://github.com/user-attachments/assets/9ae22cdf-974d-4ab0-b40d-fffab3eecaeb
+https://github.com/user-attachments/assets/76af7b83-9feb-421f-964b-bec4c0f48bfc
+
+
 ---
 
 ## 📌 Future Improvements
